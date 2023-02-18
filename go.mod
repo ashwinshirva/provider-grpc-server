@@ -1,4 +1,4 @@
-module github.com/provider-grpc-server
+module github.com/ashwinshirva/provider-grpc-server
 
 go 1.19
 
