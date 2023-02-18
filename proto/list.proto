@@ -1,0 +1,38 @@
+syntax="proto3";
+ 
+package proto;
+ 
+option go_package = "github.com/provider-grpc-server";
+ 
+ 
+message CreateReq {
+   string name = 1;
+   string description = 2;
+}
+ 
+message CreateResp {
+   string status = 1;
+}
+
+message AddItemsReq {
+    string name = 1;
+    repeated string new_items = 2;
+}
+  
+message AddItemsResp {
+   string status = 1;
+}
+
+message DeleteReq {
+   string name = 1;
+}
+ 
+message DeleteResp {
+   string status = 1;
+}
+ 
+service ListService {
+   rpc Create(CreateReq) returns (CreateResp) {}
+   rpc AddItems(AddItemsReq) returns (AddItemsResp) {}
+   rpc Delete(DeleteReq) returns (DeleteResp) {}
+}
