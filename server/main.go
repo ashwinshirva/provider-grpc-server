@@ -77,3 +77,11 @@ func (s *ListServiceServer) Delete(ctx context.Context, in *pb.DeleteReq) (*pb.D
 	fmt.Println("Delete:: Lists: ", Lists)
 	return &pb.DeleteResp{Status: "DELETED"}, nil
 }
+
+func (s *ListServiceServer) GetList(ctx context.Context, in *pb.GetReq) (*pb.GetResp, error) {
+	if Lists[in.Name] == nil {
+		return &pb.GetResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
+	}
+	fmt.Println("GetList:: Lists: ", Lists)
+	return &pb.GetResp{Status: "SUCCESS", Items: Lists[in.Name].Items}, nil
+}

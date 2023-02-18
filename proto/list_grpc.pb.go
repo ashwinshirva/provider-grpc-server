@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ListServiceClient interface {
+	GetList(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetResp, error)
 	Create(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*CreateResp, error)
 	AddItems(ctx context.Context, in *AddItemsReq, opts ...grpc.CallOption) (*AddItemsResp, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*DeleteResp, error)
@@ -33,6 +34,15 @@ type listServiceClient struct {
 
 func NewListServiceClient(cc grpc.ClientConnInterface) ListServiceClient {
 	return &listServiceClient{cc}
+}
+
+func (c *listServiceClient) GetList(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetResp, error) {
+	out := new(GetResp)
+	err := c.cc.Invoke(ctx, "/proto.ListService/GetList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *listServiceClient) Create(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*CreateResp, error) {
@@ -66,6 +76,7 @@ func (c *listServiceClient) Delete(ctx context.Context, in *DeleteReq, opts ...g
 // All implementations must embed UnimplementedListServiceServer
 // for forward compatibility
 type ListServiceServer interface {
+	GetList(context.Context, *GetReq) (*GetResp, error)
 	Create(context.Context, *CreateReq) (*CreateResp, error)
 	AddItems(context.Context, *AddItemsReq) (*AddItemsResp, error)
 	Delete(context.Context, *DeleteReq) (*DeleteResp, error)
@@ -76,6 +87,9 @@ type ListServiceServer interface {
 type UnimplementedListServiceServer struct {
 }
 
+func (UnimplementedListServiceServer) GetList(context.Context, *GetReq) (*GetResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
+}
 func (UnimplementedListServiceServer) Create(context.Context, *CreateReq) (*CreateResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
@@ -96,6 +110,24 @@ type UnsafeListServiceServer interface {
 
 func RegisterListServiceServer(s grpc.ServiceRegistrar, srv ListServiceServer) {
 	s.RegisterService(&ListService_ServiceDesc, srv)
+}
+
+func _ListService_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).GetList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.ListService/GetList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).GetList(ctx, req.(*GetReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _ListService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -159,6 +191,10 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.ListService",
 	HandlerType: (*ListServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetList",
+			Handler:    _ListService_GetList_Handler,
+		},
 		{
 			MethodName: "Create",
 			Handler:    _ListService_Create_Handler,

@@ -30,8 +30,18 @@ message DeleteReq {
 message DeleteResp {
    string status = 1;
 }
+
+message GetReq {
+   string name = 1;
+}
+ 
+message GetResp {
+   string status = 1;
+   repeated string items = 2;
+}
  
 service ListService {
+   rpc GetList(GetReq) returns (GetResp) {}
    rpc Create(CreateReq) returns (CreateResp) {}
    rpc AddItems(AddItemsReq) returns (AddItemsResp) {}
    rpc Delete(DeleteReq) returns (DeleteResp) {}
