@@ -37,7 +37,7 @@ message GetReq {
  
 message GetResp {
    string status = 1;
-   repeated string items = 2;
+   repeated int32 items = 2;
 }
  
 service ListService {

@@ -48,9 +48,15 @@ type ListServiceServer struct {
 
 func (s *ListServiceServer) Create(ctx context.Context, in *pb.CreateReq) (*pb.CreateResp, error) {
 	if Lists[in.Name] != nil {
+		//list := &List{}
 		return &pb.CreateResp{Status: "FAILED"}, errors.New(in.GetName() + " name not available")
 	}
 
+	if len(Lists) == 0 {
+		Lists = make(map[string]*List)
+	}
+
+	fmt.Println("Create request received for list: ", in.GetName())
 	Lists[in.Name] = &List{
 		Name:        in.GetName(),
 		Description: in.GetDescription(),
@@ -66,9 +72,11 @@ func (s *ListServiceServer) AddItems(ctx context.Context, in *pb.AddItemsReq) (*
 		return &pb.AddItemsResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
 	}
 
-	Lists[in.Name].Items = append(Lists[in.Name].Items, in.GetNewItems()...)
+	//Lists[in.Name].Items = append(Lists[in.Name].Items, in.GetNewItems()...)
+	Lists[in.Name].Items = in.GetNewItems()
 
-	fmt.Println("AddItems:: List: ", Lists[in.Name])
+	fmt.Printf("AddItems:: List: %v\n", Lists[in.Name])
+
 	return &pb.AddItemsResp{Status: "UPDATED"}, nil
 }
 
@@ -82,6 +90,15 @@ func (s *ListServiceServer) GetList(ctx context.Context, in *pb.GetReq) (*pb.Get
 	if Lists[in.Name] == nil {
 		return &pb.GetResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
 	}
-	fmt.Println("GetList:: Lists: ", Lists)
+
+	printLists()
 	return &pb.GetResp{Status: "SUCCESS", Items: Lists[in.Name].Items}, nil
+}
+
+func printLists() {
+	fmt.Printf("Lists: ")
+	for _, list := range Lists {
+		fmt.Printf("%v ", list)
+	}
+	fmt.Println()
 }
