@@ -16,7 +16,7 @@ message CreateResp {
 
 message AddItemsReq {
     string name = 1;
-    repeated string new_items = 2;
+    repeated int32 new_items = 2;
 }
   
 message AddItemsResp {
