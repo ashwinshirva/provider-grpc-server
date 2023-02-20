@@ -22,10 +22,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ListServiceClient interface {
-	GetList(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetResp, error)
-	Create(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*CreateResp, error)
-	AddItems(ctx context.Context, in *AddItemsReq, opts ...grpc.CallOption) (*AddItemsResp, error)
-	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*DeleteResp, error)
+	CreateList(ctx context.Context, in *CreateListReq, opts ...grpc.CallOption) (*CreateListResp, error)
+	GetList(ctx context.Context, in *GetListReq, opts ...grpc.CallOption) (*GetListResp, error)
+	UpdateListItems(ctx context.Context, in *UpdateListItemsReq, opts ...grpc.CallOption) (*UpdateListItemsResp, error)
+	DeleteList(ctx context.Context, in *DeleteListReq, opts ...grpc.CallOption) (*DeleteListResp, error)
 }
 
 type listServiceClient struct {
@@ -36,8 +36,17 @@ func NewListServiceClient(cc grpc.ClientConnInterface) ListServiceClient {
 	return &listServiceClient{cc}
 }
 
-func (c *listServiceClient) GetList(ctx context.Context, in *GetReq, opts ...grpc.CallOption) (*GetResp, error) {
-	out := new(GetResp)
+func (c *listServiceClient) CreateList(ctx context.Context, in *CreateListReq, opts ...grpc.CallOption) (*CreateListResp, error) {
+	out := new(CreateListResp)
+	err := c.cc.Invoke(ctx, "/proto.ListService/CreateList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *listServiceClient) GetList(ctx context.Context, in *GetListReq, opts ...grpc.CallOption) (*GetListResp, error) {
+	out := new(GetListResp)
 	err := c.cc.Invoke(ctx, "/proto.ListService/GetList", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -45,27 +54,18 @@ func (c *listServiceClient) GetList(ctx context.Context, in *GetReq, opts ...grp
 	return out, nil
 }
 
-func (c *listServiceClient) Create(ctx context.Context, in *CreateReq, opts ...grpc.CallOption) (*CreateResp, error) {
-	out := new(CreateResp)
-	err := c.cc.Invoke(ctx, "/proto.ListService/Create", in, out, opts...)
+func (c *listServiceClient) UpdateListItems(ctx context.Context, in *UpdateListItemsReq, opts ...grpc.CallOption) (*UpdateListItemsResp, error) {
+	out := new(UpdateListItemsResp)
+	err := c.cc.Invoke(ctx, "/proto.ListService/UpdateListItems", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *listServiceClient) AddItems(ctx context.Context, in *AddItemsReq, opts ...grpc.CallOption) (*AddItemsResp, error) {
-	out := new(AddItemsResp)
-	err := c.cc.Invoke(ctx, "/proto.ListService/AddItems", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *listServiceClient) Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*DeleteResp, error) {
-	out := new(DeleteResp)
-	err := c.cc.Invoke(ctx, "/proto.ListService/Delete", in, out, opts...)
+func (c *listServiceClient) DeleteList(ctx context.Context, in *DeleteListReq, opts ...grpc.CallOption) (*DeleteListResp, error) {
+	out := new(DeleteListResp)
+	err := c.cc.Invoke(ctx, "/proto.ListService/DeleteList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +76,10 @@ func (c *listServiceClient) Delete(ctx context.Context, in *DeleteReq, opts ...g
 // All implementations must embed UnimplementedListServiceServer
 // for forward compatibility
 type ListServiceServer interface {
-	GetList(context.Context, *GetReq) (*GetResp, error)
-	Create(context.Context, *CreateReq) (*CreateResp, error)
-	AddItems(context.Context, *AddItemsReq) (*AddItemsResp, error)
-	Delete(context.Context, *DeleteReq) (*DeleteResp, error)
+	CreateList(context.Context, *CreateListReq) (*CreateListResp, error)
+	GetList(context.Context, *GetListReq) (*GetListResp, error)
+	UpdateListItems(context.Context, *UpdateListItemsReq) (*UpdateListItemsResp, error)
+	DeleteList(context.Context, *DeleteListReq) (*DeleteListResp, error)
 	mustEmbedUnimplementedListServiceServer()
 }
 
@@ -87,17 +87,17 @@ type ListServiceServer interface {
 type UnimplementedListServiceServer struct {
 }
 
-func (UnimplementedListServiceServer) GetList(context.Context, *GetReq) (*GetResp, error) {
+func (UnimplementedListServiceServer) CreateList(context.Context, *CreateListReq) (*CreateListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateList not implemented")
+}
+func (UnimplementedListServiceServer) GetList(context.Context, *GetListReq) (*GetListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetList not implemented")
 }
-func (UnimplementedListServiceServer) Create(context.Context, *CreateReq) (*CreateResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+func (UnimplementedListServiceServer) UpdateListItems(context.Context, *UpdateListItemsReq) (*UpdateListItemsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateListItems not implemented")
 }
-func (UnimplementedListServiceServer) AddItems(context.Context, *AddItemsReq) (*AddItemsResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddItems not implemented")
-}
-func (UnimplementedListServiceServer) Delete(context.Context, *DeleteReq) (*DeleteResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+func (UnimplementedListServiceServer) DeleteList(context.Context, *DeleteListReq) (*DeleteListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteList not implemented")
 }
 func (UnimplementedListServiceServer) mustEmbedUnimplementedListServiceServer() {}
 
@@ -112,8 +112,26 @@ func RegisterListServiceServer(s grpc.ServiceRegistrar, srv ListServiceServer) {
 	s.RegisterService(&ListService_ServiceDesc, srv)
 }
 
+func _ListService_CreateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateListReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ListServiceServer).CreateList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.ListService/CreateList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ListServiceServer).CreateList(ctx, req.(*CreateListReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ListService_GetList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetReq)
+	in := new(GetListReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -125,61 +143,43 @@ func _ListService_GetList_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/proto.ListService/GetList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ListServiceServer).GetList(ctx, req.(*GetReq))
+		return srv.(ListServiceServer).GetList(ctx, req.(*GetListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ListService_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateReq)
+func _ListService_UpdateListItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateListItemsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ListServiceServer).Create(ctx, in)
+		return srv.(ListServiceServer).UpdateListItems(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ListService/Create",
+		FullMethod: "/proto.ListService/UpdateListItems",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ListServiceServer).Create(ctx, req.(*CreateReq))
+		return srv.(ListServiceServer).UpdateListItems(ctx, req.(*UpdateListItemsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ListService_AddItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddItemsReq)
+func _ListService_DeleteList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteListReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ListServiceServer).AddItems(ctx, in)
+		return srv.(ListServiceServer).DeleteList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.ListService/AddItems",
+		FullMethod: "/proto.ListService/DeleteList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ListServiceServer).AddItems(ctx, req.(*AddItemsReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ListService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ListServiceServer).Delete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.ListService/Delete",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ListServiceServer).Delete(ctx, req.(*DeleteReq))
+		return srv.(ListServiceServer).DeleteList(ctx, req.(*DeleteListReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,20 +192,20 @@ var ListService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*ListServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "CreateList",
+			Handler:    _ListService_CreateList_Handler,
+		},
+		{
 			MethodName: "GetList",
 			Handler:    _ListService_GetList_Handler,
 		},
 		{
-			MethodName: "Create",
-			Handler:    _ListService_Create_Handler,
+			MethodName: "UpdateListItems",
+			Handler:    _ListService_UpdateListItems_Handler,
 		},
 		{
-			MethodName: "AddItems",
-			Handler:    _ListService_AddItems_Handler,
-		},
-		{
-			MethodName: "Delete",
-			Handler:    _ListService_Delete_Handler,
+			MethodName: "DeleteList",
+			Handler:    _ListService_DeleteList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

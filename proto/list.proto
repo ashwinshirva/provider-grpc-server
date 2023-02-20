@@ -5,44 +5,44 @@ package proto;
 option go_package = "github.com/provider-grpc-server";
  
  
-message CreateReq {
+message CreateListReq {
    string name = 1;
    string description = 2;
 }
  
-message CreateResp {
+message CreateListResp {
    string status = 1;
 }
 
-message AddItemsReq {
+message UpdateListItemsReq {
     string name = 1;
     repeated int32 new_items = 2;
 }
   
-message AddItemsResp {
+message UpdateListItemsResp {
    string status = 1;
 }
 
-message DeleteReq {
+message DeleteListReq {
    string name = 1;
 }
  
-message DeleteResp {
+message DeleteListResp {
    string status = 1;
 }
 
-message GetReq {
+message GetListReq {
    string name = 1;
 }
  
-message GetResp {
+message GetListResp {
    string status = 1;
    repeated int32 items = 2;
 }
  
 service ListService {
-   rpc GetList(GetReq) returns (GetResp) {}
-   rpc Create(CreateReq) returns (CreateResp) {}
-   rpc AddItems(AddItemsReq) returns (AddItemsResp) {}
-   rpc Delete(DeleteReq) returns (DeleteResp) {}
+   rpc CreateList(CreateListReq) returns (CreateListResp) {}
+   rpc GetList(GetListReq) returns (GetListResp) {}
+   rpc UpdateListItems(UpdateListItemsReq) returns (UpdateListItemsResp) {}
+   rpc DeleteList(DeleteListReq) returns (DeleteListResp) {}
 }

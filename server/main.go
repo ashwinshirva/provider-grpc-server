@@ -39,60 +39,62 @@ var Lists map[string]*List
 type List struct {
 	Name        string
 	Description string
-	Items       []string
+	Items       []int32
 }
 
 type ListServiceServer struct {
 	pb.UnimplementedListServiceServer
 }
 
-func (s *ListServiceServer) Create(ctx context.Context, in *pb.CreateReq) (*pb.CreateResp, error) {
+func (s *ListServiceServer) CreateList(ctx context.Context, in *pb.CreateListReq) (*pb.CreateListResp, error) {
 	if Lists[in.Name] != nil {
 		//list := &List{}
-		return &pb.CreateResp{Status: "FAILED"}, errors.New(in.GetName() + " name not available")
+		return &pb.CreateListResp{Status: "FAILED"}, errors.New(in.GetName() + " name not available")
 	}
 
 	if len(Lists) == 0 {
 		Lists = make(map[string]*List)
 	}
 
-	fmt.Println("Create request received for list: ", in.GetName())
+	fmt.Println("CreateList:: Create request received for list: ", in.GetName())
 	Lists[in.Name] = &List{
 		Name:        in.GetName(),
 		Description: in.GetDescription(),
-		Items:       make([]string, 0, 1),
+		Items:       make([]int32, 0, 1),
 	}
 
-	fmt.Println("Create:: List: ", Lists[in.Name])
-	return &pb.CreateResp{Status: "CREATED"}, nil
+	fmt.Println("CreateList:: List: ", Lists[in.Name])
+	return &pb.CreateListResp{Status: "CREATED"}, nil
 }
 
-func (s *ListServiceServer) AddItems(ctx context.Context, in *pb.AddItemsReq) (*pb.AddItemsResp, error) {
-	if Lists[in.Name] != nil {
-		return &pb.AddItemsResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
+func (s *ListServiceServer) UpdateListItems(ctx context.Context, in *pb.UpdateListItemsReq) (*pb.UpdateListItemsResp, error) {
+	fmt.Println("UpdateListItems:: UpdateListItems called...: ", in.GetName())
+	printLists()
+	if Lists[in.Name] == nil {
+		return &pb.UpdateListItemsResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
 	}
 
 	//Lists[in.Name].Items = append(Lists[in.Name].Items, in.GetNewItems()...)
 	Lists[in.Name].Items = in.GetNewItems()
 
-	fmt.Printf("AddItems:: List: %v\n", Lists[in.Name])
+	fmt.Printf("UpdateListItems:: List: %v\n", Lists[in.Name])
 
-	return &pb.AddItemsResp{Status: "UPDATED"}, nil
+	return &pb.UpdateListItemsResp{Status: "UPDATED"}, nil
 }
 
-func (s *ListServiceServer) Delete(ctx context.Context, in *pb.DeleteReq) (*pb.DeleteResp, error) {
+func (s *ListServiceServer) DeleteList(ctx context.Context, in *pb.DeleteListReq) (*pb.DeleteListResp, error) {
 	delete(Lists, in.GetName())
 	fmt.Println("Delete:: Lists: ", Lists)
-	return &pb.DeleteResp{Status: "DELETED"}, nil
+	return &pb.DeleteListResp{Status: "DELETED"}, nil
 }
 
-func (s *ListServiceServer) GetList(ctx context.Context, in *pb.GetReq) (*pb.GetResp, error) {
+func (s *ListServiceServer) GetList(ctx context.Context, in *pb.GetListReq) (*pb.GetListResp, error) {
 	if Lists[in.Name] == nil {
-		return &pb.GetResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
+		return &pb.GetListResp{Status: "FAILED"}, errors.New(in.GetName() + " list does not exist")
 	}
 
 	printLists()
-	return &pb.GetResp{Status: "SUCCESS", Items: Lists[in.Name].Items}, nil
+	return &pb.GetListResp{Status: "SUCCESS", Items: Lists[in.Name].Items}, nil
 }
 
 func printLists() {
